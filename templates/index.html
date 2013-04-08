@@ -1,0 +1,19 @@
+<!doctype html>
+<title>Myyoutube</title>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+<div class=page>
+  <h1>Videos</h1>
+  <div class=metanav>
+  </div>
+{% for video in objects %}
+{{video.name}}
+{{video.rates}}
+{{video.filename}}
+{% endfor %}
+
+
+  {% for message in get_flashed_messages() %}
+    <div class=flash>{{ message }}</div>
+  {% endfor %}
+  {% block body %}{% endblock %}
+</div>

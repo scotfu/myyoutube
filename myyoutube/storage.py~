@@ -1,0 +1,30 @@
+
+import boto
+import boto.s3
+
+class Storage:
+    def __init__(self):
+        self.conn=boto.connect_s3(aws_access_key_id =app.config[' AWS_ACCESS_KEY'], aws_secret_access_key = app.config['AWS_SECRET_KEY'])
+        print 'instablish connection for s3'
+    def create_bucket(self, name):
+        name = u'shancong-fu-'+ name
+        bucket = self.conn.create_bucket(name)
+        return bucket
+
+    def save_string(self, bucket, name, value):
+        k=boto.s3.key.Key(bucket)
+        k.key=name
+        k.set_contents_from_string(value)
+    
+    def get_string(self,bucket,name):
+        k=boto.s3.key.Key(bucket)
+        k.key=name
+        return k.get_contents_as_string()
+
+    def save_file(self, bucket, name,file_path):
+        k=boto.s3.key.Key(bucket)
+        k.key=name
+        k.set_contents_from_filename(file_path)
+        
+    def get_key_url(bucker_name,key_name):
+        return s3.conn.generate_url(60, 'GET', bucket=b.name, key=k.name, force_http=True)
