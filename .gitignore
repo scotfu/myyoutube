@@ -1,4 +1,6 @@
 *.py[cod]
+#emacs tmp file
+*~
 
 # C extensions
 *.so

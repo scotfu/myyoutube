@@ -1,4 +1,1 @@
-myyoutube
-=========
-
-flask aws
+A mini youtube, based on flask,aws(ec2,s3,cloudfront,RDS),mysql
