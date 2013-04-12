@@ -5,7 +5,7 @@ from sqlalchemy import Column, Integer, String, DateTime
 class Video(Base):
     __tablename__ = 'videos'
     id = Column(Integer, primary_key=True)
-    name = Column(String(50), unique=True)
+    name = Column(String(50))
     filename = Column(String(50), unique=True)
     timestamp = Column(DateTime)
     rates = Column(Integer)

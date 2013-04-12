@@ -7,12 +7,12 @@ app = Flask(__name__, static_folder='../static',
 app.config.from_object(config.DevelopmentConfig)
 
 from . import views
-from .aws import RDS
+#from .aws import RDS
 
-rds=RDS()
-rds.create_instance('mysqlforfu','fu','fupass','youtube')
-rds.create_group()
-mysql_address = rds.get_address()
+#rds=RDS()
+#rds.create_instance('mysqlforfu','fu','fupass','youtube')
+#rds.create_group()
+#mysql_address = rds.get_address()
 
 if __name__ == '__main__':
     app.run(debug=True)
