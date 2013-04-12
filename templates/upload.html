@@ -1,7 +1,30 @@
-    <!doctype html>
-    <title>Upload new File</title>
+{% extends 'layout.html'%}
+{% block title%}
+Upload new video
+{% endblock%}
+
+
+{%block navbar %}
+<div class="navbar">
+  <div class="navbar-inner">
+    <a class="brand" href="/">MYyoutube</a>
+    <ul class="nav">
+      <li><a href="/">Home</a></li>
+      <li class='active'><a href="{{ url_for('upload_file')}}">Upload</a></li>
+    </ul>
+  </div>
+</div>
+
+{%endblock navbar%}
+
+{% block body%}
+
     <h1>Upload new File</h1>
-    <form action="" method=post enctype=multipart/form-data>
-      <p><input type=file name=file>
-         <input type=submit value=Upload>
+    <form class="form-inline" action="" method=post enctype=multipart/form-data>
+
+<label>Name</label>: <input type=text name='name'>
+<span class="help-block">Example block-level help text here.</span>
+<label>File</label>: <input type=file name=file><br/>
+<button class="btn " type="submit">Upload</button>
     </form>
+{% endblock body%}

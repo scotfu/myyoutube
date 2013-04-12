@@ -1,19 +1,49 @@
-<!doctype html>
-<title>Myyoutube</title>
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-<div class=page>
-  <h1>Videos</h1>
-  <div class=metanav>
-  </div>
+{% extends 'layout.html'%}
+{% block body %}
+ <div class="row-fluid">
+
+<div class="page-header">
+  <h2>Videos</h2>
+</div>
+
+
+            <ul class="thumbnails">
+
 {% for video in objects %}
-{{video.name}}
-{{video.rates}}
-{{video.filename}}
+              <li class="span4">
+
+<a href = "/videos/{{video.id}}">
+<img style="width: 300px; height: 200px;" src="/static/uploads/{{video.filename}}.png"></a>
+<p>
+      <h3 align="center">{{video.name}}</h3>
+    
+</p>
+              </li>
+
 {% endfor %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   {% for message in get_flashed_messages() %}
     <div class=flash>{{ message }}</div>
   {% endfor %}
-  {% block body %}{% endblock %}
-</div>
+  
+
+{% endblock body %}
