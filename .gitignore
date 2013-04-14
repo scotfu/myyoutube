@@ -1,6 +1,8 @@
 *.py[cod]
 #emacs tmp file
 *~
+*.mp4
+*.mov
 
 # C extensions
 *.so
