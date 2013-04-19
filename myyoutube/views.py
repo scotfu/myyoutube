@@ -1,5 +1,6 @@
 # -*-coding:utf-8 -*-
 import os
+import hashlib
 import random
 import datetime
 import json
@@ -12,7 +13,8 @@ from . import app
 from .database import db_session
 from .models import Video
 from .aws import Storage
-import hashlib
+from .aws import CloudFront
+
 
 #views = Blueprint('views', __name__, static_folder='../static',template_folder='../templates')
 
@@ -23,6 +25,19 @@ if app.config['S3']:
     except:
         bucket = s3.create_bucket(app.config['S3_BUCKET_NAME'])
 
+if app.config['CLOUDFORNT']:
+    if app.config['S3']:
+        front=CloudFront()
+        try:
+            download_domain = front.get_download_distrs()[0].domain_name
+        except:
+            download_domain = front.create_download_distrs(s3,'downaload').domain_name
+        try:
+            streaming_domain = front.get_streaming_distrs()[0].domain_name
+        except:
+            streaming_domain =front. create_streaming_distrs(s3,'download').domain_name
+    else:
+        print 'Please enable S3 if you want to use CloudFront'
     
 
 @app.teardown_request
@@ -68,10 +83,11 @@ def upload_file():
             final_filename = filename.rsplit('.', 1)[0].lower()
             v=Video(name=name, filename=final_filename)
             if filename.rsplit('.', 1)[1].lower() != u'mp4':
-                os.system('ffmpeg -i /home/fu/tmp/uploads/%s -f mp4 -vcodec copy -acodec copy /home/fu/cloud/assigment2/static/uploads/%s.mp4'%(file.filename, final_filename))
-            os.system('ffmpeg -i /home/fu/tmp/uploads/%s -ss 00:00:01 -f image2 -vframes 1 /home/fu/cloud/assigment2/static/uploads/%s.png'%(file.filename, final_filename))
+                os.system('ffmpeg -i {file_full_path} -f mp4 -vcodec copy -acodec copy {file_path}.mp4'.format(app.config['UPLOAD_FOLDER']+str(file.filename), app.config['UPLOAD_FOLDER']+str(final_filename)))
+            os.system('ffmpeg -i {file_full_path} -ss 00:00:01 -f image2 -vframes 1 {file_path}.png'.format(app.config['UPLOAD_FOLDER']+str(file.filename), app.config['UPLOAD_FOLDER']+str(final_filename)))
             if app.config['S3']:
-                s3.save_file(bucket, filename, file)
+                s3.save_file(bucket, filename, app.config['UPLOAD_FOLDER']+str(final_filename)+'.mp4')
+                s3.save_file(bucket, filename, app.config['UPLOAD_FOLDER']+str(final_filename)+'.png')
 
             db_session.add(v)
             db_session.commit()
@@ -86,7 +102,9 @@ def videos(video_id):
     video = Video.query.get(video_id)
     if not video:
         return url_for('index')
-    video.url ='https://s3.amazonaws.com/shancong-fu-youtube/'+ video.filename
+    
+    video.url= streaming_domain+video.filename
+    video.preview_url =download_domain+filename
     return render_template('video.html', video=video)
 
 
@@ -111,8 +129,3 @@ def like():
 #ffmpeg -i movie.mov -f mp4 -vcodec copy -acodec copy output.mp4
 #ffmpeg -i output.mp4 -ss 00:00:01 -f image2 -vframes 1 out.png
 
-#video_api = VideoAPI.as_view('video_api')
-#app.add_url_rule('/videos/', defaults={'user_id': None},
-#                 view_func=video_api, methods=['GET',])
-#app.add_url_rule('/videos/<int:video_id>', view_func=video_api,
-#                 methods=['GET', 'PUT', 'DELETE'])

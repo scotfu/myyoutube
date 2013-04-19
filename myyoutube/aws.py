@@ -1,11 +1,11 @@
 import boto
 import boto.s3
 import boto.rds
-from myyoutube import app
+import time
 
 class Storage:
     def __init__(self):
-        self.conn=boto.connect_s3(aws_access_key_id =app.config['AWS_ACCESS_KEY'], aws_secret_access_key = app.config['AWS_SECRET_KEY'])
+        self.conn=boto.connect_s3()
         print 'instablish connection for s3'
     def create_bucket(self, name):
         name = u'shancong-fu-'+ name
@@ -34,25 +34,44 @@ class Storage:
 
 class CloudFront:
     def __init__(self):
-        self.conn = boto.connect_cloudfront(aws_access_key_id =app.config['AWS_ACCESS_KEY'], aws_secret_access_key = app.config['AWS_SECRET_KEY'])
+        self.conn = boto.connect_cloudfront()
 
-    def create_distr(self, origin, comment):
+    def create_download_distr(self, origin, comment):
         distro = self.conn.create_distribution(origin=origin, enabled=True, comment=comment)
+        print 'download done'
+        return distro
+    def create_streaming_distr(self,origin,comment):    
+        distro = self.conn.create_streaming_distribution(origin=origin, enabled=True, comment=comment)
+        print 'straming done'
+        return distro
+    def get_download_distrs(self):
+        print 'get download'
+        return self.conn.get_all_distributions()
 
+    def get_streaming_distrs(self):
+        print 'get streaming'
+        return self.conn.get_all_streaming_distributions()
+        
 
 class RDS:
     def __init__(self):
-        self.conn = boto.rds.RDSConnection(aws_access_key_id =app.config['AWS_ACCESS_KEY'], aws_secret_access_key = app.config['AWS_SECRET_KEY'])
+        self.conn = boto.rds.RDSConnection()
 
-    def create_instance(self, user_name, password,db_name):
-        instance = self.conn.create_dbinstance('db-master-1', 5, 'db.t1.micro', user_name, password,db_name=db_name)
+    def create_instance(self):
+        instance = self.conn.create_dbinstance('myrds', 5, 'db.t1.micro', 'fu','fupassword',db_name='youtube')
+        while instance.status != u'available':
+            print 'wating ...'
+            time.sleep(5)
+            instance.update()
+        print 'mysql done'    
+        return instance    
 
     def create_group(self, ip=None):
         sg = self.conn.create_dbsecurity_group('web_servers', 'Web front-ends')
         sg.authorize(cidr_ip='69.121.15.191/32')
 
     def get_address(self):
-        return self.conn.get_all_dbinstances("db-master-1")[0].endpoint[0]
+        return self.conn.get_all_dbinstances("myrds")[0].endpoint[0]
 
 if __name__ == '__main__':
     pass

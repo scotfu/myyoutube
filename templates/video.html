@@ -4,42 +4,52 @@
 
 
 <div class="offset2">
+
 <div class="page-header" >
   <h3>{{video.name}}</h3>
 </div>
 
-<script type="text/javascript" src="{{ url_for('static', filename='jwplayer/jwplayer.js')}}"></script>
-<script type="text/javascript">jwplayer.key="ABCDEFGHIJKLMOPQ";</script>
-<div id="myElement">Loading the player...</div>
-
-<script type="text/javascript">
-    jwplayer("myElement").setup({
-        file: "/static/uploads/{{video.filename}}.mp4",
-        image: "/static/uploads/{{video.filename}}.png"
-    });
-</script>
+<div class="span4">
+<video height="270" width="480" id="myVideo"  controls>
+ <source src="/static/uploads/{{video.filename}}.mp4" type="video/mp4" >
+</video>
+</div>
 
 
-
-Like:<label id ="like_num">{{video.rates}}</label></br>
+<div class="span10">
+<label id ="like_num">Like:{{video.rates}}</label>
 <button id='like' class="btn" type="button"><i class="icon-plus"></i>Like</button>
-
-
+</div>
 
 </div>
 
 {% endblock body %}
 {% block script %}
-
+<script type="text/javascript" src="{{ url_for('static', filename='jwplayer/jwplayer.js')}}"></script>
+<script type="text/javascript">jwplayer.key="ABCDEFGHIJKLMOPQ";</script>
 <script type="text/javascript">
-$("#like").click(function() {
+ jwplayer("myVideo").setup({
+         'file': "/static/uploads/{{video.filename}}.mp4",
+         'image':"/static/uploads/{{video.filename}}.png",
+        'height': 270,
+        'width': 480,
+	'provider': "rtmp",
+        'streamer': "rtmp://sxxxxxxxxxxxx/cfx/st",
+	'modes': [
+        { type: 'html5' },
+        { type: 'flash', src: '/jwplayer/player.swf' }
+    ]
+    });
 
+
+$("#like").click(function() {
 $.post('/like/',{'video_id':{{video.id}}}, function(data) {
   data=$.parseJSON(data);
-  $('#like_num').html(data.like);
+  $('#like_num').html("Like:"+data.like);
 });
-
 });
 
 </script>
+
+
 {% endblock script %}
