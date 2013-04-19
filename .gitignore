@@ -3,7 +3,8 @@
 *~
 *.mp4
 *.mov
-
+*.png
+*.MOV
 # C extensions
 *.so
 
