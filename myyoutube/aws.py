@@ -26,7 +26,7 @@ class Storage:
         k=boto.s3.key.Key(bucket)
         k.key=name
         print type(k)
-        k.set_contents_from_file(file)
+        k.set_contents_from_filename(file)
         k.make_public()
 
     def get_key_url(bucker_name,key_name):

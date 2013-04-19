@@ -83,8 +83,8 @@ def upload_file():
             final_filename = filename.rsplit('.', 1)[0].lower()
             v=Video(name=name, filename=final_filename)
             if filename.rsplit('.', 1)[1].lower() != u'mp4':
-                os.system('ffmpeg -i {file_full_path} -f mp4 -vcodec copy -acodec copy {file_path}.mp4'.format({'file_full_path':app.config['UPLOAD_FOLDER']+str(file.filename), 'file_path':app.config['UPLOAD_FOLDER']+str(final_filename)))
-            os.system('ffmpeg -i {file_full_path} -ss 00:00:01 -f image2 -vframes 1 {file_path}.png'.format({'file_full_path':app.config['UPLOAD_FOLDER']+str(file.filename), 'file_path':app.config['UPLOAD_FOLDER']+str(final_filename))})
+                os.system('ffmpeg -i {file_full_path} -f mp4 -vcodec copy -acodec copy {file_path}.mp4'.format(file_full_path=app.config['UPLOAD_FOLDER']+str(file.filename), file_path=app.config['UPLOAD_FOLDER']+str(final_filename)))
+            os.system('ffmpeg -i {file_full_path} -ss 00:00:01 -f image2 -vframes 1 {file_path}.png'.format(file_full_path=app.config['UPLOAD_FOLDER']+str(file.filename), file_path=app.config['UPLOAD_FOLDER']+str(final_filename)))
             if app.config['S3']:
                 s3.save_file(bucket, filename, app.config['UPLOAD_FOLDER']+str(final_filename)+'.mp4')
                 s3.save_file(bucket, filename, app.config['UPLOAD_FOLDER']+str(final_filename)+'.png')
@@ -104,7 +104,7 @@ def videos(video_id):
         return url_for('index')
     
     video.url= streaming_domain+video.filename
-    video.preview_url =download_domain+filename
+    video.preview_url =download_domain+video.filename
     return render_template('video.html', video=video)
 
 
