@@ -35,7 +35,7 @@ if app.config['CLOUDFORNT']:
         try:
             streaming_domain = front.get_streaming_distrs()[0].domain_name
         except:
-            streaming_domain =front. create_streaming_distrs(s3,'download').domain_name
+            streaming_domain =front. create_streaming_distrs(s3,'streaming').domain_name
     else:
         print 'Please enable S3 if you want to use CloudFront'
     
