@@ -78,17 +78,16 @@ def upload_file():
         file = request.files['file']
         name = request.form['name']
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename).strip()
+            filename = timestamp+'-'+secure_filename(file.filename).strip()
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            final_filename = filename.rsplit('.', 1)[0].lower()
+            final_filename = filename.split('.')[0]
             v=Video(name=name, filename=final_filename)
             if filename.rsplit('.', 1)[1].lower() != u'mp4':
                 os.system('ffmpeg -i {file_full_path} -f mp4 -vcodec copy -acodec copy {file_path}.mp4'.format(file_full_path=app.config['UPLOAD_FOLDER']+str(file.filename), file_path=app.config['UPLOAD_FOLDER']+str(final_filename)))
             os.system('ffmpeg -i {file_full_path} -ss 00:00:01 -f image2 -vframes 1 {file_path}.png'.format(file_full_path=app.config['UPLOAD_FOLDER']+str(file.filename), file_path=app.config['UPLOAD_FOLDER']+str(final_filename)))
             if app.config['S3']:
-                s3.save_file(bucket, filename, app.config['UPLOAD_FOLDER']+str(final_filename)+'.mp4')
-                s3.save_file(bucket, filename, app.config['UPLOAD_FOLDER']+str(final_filename)+'.png')
-
+                s3.save_file(bucket, final_filename+'.mp4', app.config['UPLOAD_FOLDER']+str(final_filename)+'.mp4')
+                s3.save_file(bucket, final_filename+'.png', app.config['UPLOAD_FOLDER']+str(final_filename)+'.png')
             db_session.add(v)
             db_session.commit()
             return redirect(url_for('videos',video_id=v.id))
@@ -102,9 +101,10 @@ def videos(video_id):
     video = Video.query.get(video_id)
     if not video:
         return url_for('index')
-    
-    video.url= streaming_domain+video.filename
-    video.preview_url =download_domain+video.filename
+#'file': "rtmp://dxxxxxxxxxxxx/cfx/st/mp4:videoname.mp4"    
+    video.url=  'rtmp://'+streaming_domain+'/cfx/st/mp4:'+video.filename+'.mp4'
+    video.download_url =  'https://'+download_domain+'/'+video.filename+'.mp4'
+    video.image_url = 'https://'+download_domain+'/'+video.filename+'.png'
     return render_template('video.html', video=video)
 
 

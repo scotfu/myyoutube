@@ -18,7 +18,7 @@ class DevelopmentConfig(Config):
     DEBUG = True
     S3 = True
     CLOUDFORNT = True
-    RDS= False
+    RDS= True
 
 class TestingConfig(Config):
     TESTING = True

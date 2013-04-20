@@ -25,7 +25,7 @@ class Storage:
     def save_file(self, bucket, name,file):
         k=boto.s3.key.Key(bucket)
         k.key=name
-        print type(k)
+        print file
         k.set_contents_from_filename(file)
         k.make_public()
 
