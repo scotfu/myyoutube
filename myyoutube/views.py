@@ -73,6 +73,7 @@ def allowed_file(filename):
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
+    error=''
     if request.method == 'POST':
         timestamp = datetime.datetime.now().strftime('%Y%m%d-%H-%M-%S')
         file = request.files['file']
@@ -83,24 +84,23 @@ def upload_file():
             final_filename = filename.split('.')[0]
             v=Video(name=name, filename=final_filename)
             if filename.rsplit('.', 1)[1].lower() != u'mp4':
-                os.system('ffmpeg -i {file_full_path} -f mp4 -vcodec copy -acodec copy {file_path}.mp4'.format(file_full_path=app.config['UPLOAD_FOLDER']+str(file.filename), file_path=app.config['UPLOAD_FOLDER']+str(final_filename)))
-            os.system('ffmpeg -i {file_full_path} -ss 00:00:01 -f image2 -vframes 1 {file_path}.png'.format(file_full_path=app.config['UPLOAD_FOLDER']+str(file.filename), file_path=app.config['UPLOAD_FOLDER']+str(final_filename)))
+                os.system('ffmpeg -i {file_full_path} -f mp4 -vcodec copy -acodec copy {file_path}.mp4'.format(file_full_path=app.config['UPLOAD_FOLDER']+filename, file_path=app.config['UPLOAD_FOLDER']+str(final_filename)))
+            os.system('ffmpeg -i {file_full_path} -ss 00:00:01 -f image2 -vframes 1 {file_path}.png'.format(file_full_path=app.config['UPLOAD_FOLDER']+filename, file_path=app.config['UPLOAD_FOLDER']+str(final_filename)))
             if app.config['S3']:
                 s3.save_file(bucket, final_filename+'.mp4', app.config['UPLOAD_FOLDER']+str(final_filename)+'.mp4')
                 s3.save_file(bucket, final_filename+'.png', app.config['UPLOAD_FOLDER']+str(final_filename)+'.png')
             db_session.add(v)
             db_session.commit()
             return redirect(url_for('videos',video_id=v.id))
-        
-    return render_template('upload.html')
-
+        error=u'Wrong file type'
+    return render_template('upload.html',error=error)
 @app.route('/videos/<int:video_id>',methods=['GET'])
 def videos(video_id):
     if video_id is None:
-        return url_for('index')
+        return redirect(url_for('index'))
     video = Video.query.get(video_id)
     if not video:
-        return url_for('index')
+        return redirect(url_for('index'))
 #'file': "rtmp://dxxxxxxxxxxxx/cfx/st/mp4:videoname.mp4"    
     video.url=  'rtmp://'+streaming_domain+'/cfx/st/mp4:'+video.filename+'.mp4'
     video.download_url =  'https://'+download_domain+'/'+video.filename+'.mp4'
@@ -126,6 +126,14 @@ def like():
         return json.dumps(data)
     return json.dumps({'ret':'failed'})
 
+@app.route('/delete/<int:video_id>',methods=['POST','GET'])
+def delete(video_id):
+    try:
+        v=Video.query.get(video_id)
+    except:
+        return 'Wrong'
+    db_session.delete(v)
+    db_session.commit()    
+    return redirect((url_for('index')))
 #ffmpeg -i movie.mov -f mp4 -vcodec copy -acodec copy output.mp4
 #ffmpeg -i output.mp4 -ss 00:00:01 -f image2 -vframes 1 out.png
-

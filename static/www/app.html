@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="n">
+  <head>
+        <meta name="title" content="App" />
+<meta name="content-type" content="text/html; charset=utf-8" />
+<meta name="apple-mobile-web-app-capable" content="no" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    
+    <meta content="RobotFruit" name="title" /> 
+    <meta property="og:title" content="RobotFruit" /> 
+    <meta property="og:description" content="RobotFruit let's you engage with your audience via mobile devices" />
+    <meta property="og:image" content="/uploads/app/app_icon.png"/>
+    
+    <meta content="width=100%; 
+             initial-scale=1;
+             maximum-scale=1;
+             minimum-scale=1; 
+             user-scalable=no;" name="viewport">
+    <title>RobotFruit</title>
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link href="/uploads/app/welcome_screen-retina.png" rel="apple-touch-startup-image">
+    <link href="/uploads/app/app_icon.png" rel="apple-touch-icon">
+    
+    <script type="text/javascript" src="cordova-2.2.0.js"></script>
+    
+
+    <link rel="stylesheet" type="text/css" media="screen" href="css/mobile.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="css/jquery.ui.all.css" />
+        
+    
+  </head>
+  <body>
+    
+    <noscript>
+      &lt;div class="boxAnnounce"&gt;
+				JavaScript must be enabled in order for you to use this app. However, it seems JavaScript is either disabled or not supported by your browser. 
+			&lt;/div&gt;
+    </noscript>
+    
+    
+    <div id="master-content">
+        <div id='splash' style='position: absolute; top: 60px; width: 100%; text-align: center;'>
+	  <span style='font-size: 13px; color: gray'>Loading RobotFruit..</span>
+	</div>
+    </div>
+    
+   <script id="search" type="text/html"><![CDATA[
+			<form id="searchForm">
+				<fieldset>
+					<div class="field">
+						<input name="query" id="query" autocapitalize="off" autocorrect="off" autocomplete="off" type="text" />
+						<img class="searchIcon" src="<%= imageUrl(I.searchIcon)%>" />
+					</div>
+				</fieldset>
+			</form>
+			<ul id="resultsList" class="feed feedPosts">
+			</ul>
+			<ul id="loadMoreButtonContainer" class="boxButtons buttons btnSmallButtons" style="display: none"> 
+				<li class="item">
+					<button id="loadMoreButton" class="btnButton"><%= M.locLoadMoreButtonTitle %></button>  
+				</li>
+			</ul>
+			]]></script>
+    <script id="search_item" type="text/html"><![CDATA[
+			<li class="item" onclick="navigateTo(getShoutDetailsUrl(<%= shout.id %>))">
+  			<img class="icon" width="48" height="48" src="<%= shout.profile_image_url %>">
+  			<p class="content">
+						<span class="nick"><%= shout.from_user %></span>
+      			<span><%= stripTags(shout.text) %></span>
+  			</p>
+  			<ul class="txtInfo">
+    			<li class="time_distance">
+					<%= timeDistanceInWords(shout.created_at) %>
+				</li>
+  			</ul>
+			</li>
+			]]></script>
+    <script id="navigation_bar_button" type="text/html"><![CDATA[
+			<div class="se-toolbar-btn">
+					<div class="se-separator"></div>
+					<div class="se-toolbar-btn-inner">
+					<% if (icon) { %>
+						<div class="se-icon" style="background-image: url(<%= imageUrl(icon)%>)"></div>
+					<% } %>
+					<% if (title) { %>
+						<div class="se-text se-single-line"><%= title%></div>
+					<% } %>
+					</div>
+			</div>
+			]]></script>
+    <script id="title_bar_item" type="text/html"><![CDATA[
+			<div class="se-title-bar"><div class="se-title-bar-inner"><div class="se-text se-single-line"><%= title%></div></div></div>
+			]]></script>
+    <script id="title_bar_notice" type="text/html"><![CDATA[
+			<div class="se-title-bar"><div class="se-title-bar-inner"><div class="se-text"><%= title%></div></div></div>
+			]]></script>
+    <script id="screen_item" type="text/html"><![CDATA[
+			<div>		
+				<div id="screenContainer">
+					<div id="screen">					
+						<div id="content"></div> 
+					</div>
+				</div>
+				<iframe id="deviceUrl" style="display: none"></iframe>
+				<div id="activityIndicator" style="display: none"><div class="spinner"></div></div>
+				<div id="globalComponents"></div>
+			</div>
+			]]></script>
+    <script id="places_new" type="text/html"><![CDATA[
+				<img class="place map"/>
+				<form method="post">
+					<fieldset>
+						<div class="field">
+							<input type="text" name="name" value="<%= name %>" placeholder="<%= M.locPlaceName %>"/>
+						</div>
+						<div class="field">														
+							<input type="text" name="address" value="<%= address %>" placeholder="<%= M.locPlaceAddress %>"/>
+						</div>
+						<div class="field">
+							<input type="text" name="city" value="<%= city %>" placeholder="<%= M.locPlaceCity %>"/>
+						</div>
+						<div class="field">
+							<input type="text" name="country" value="<%= country %>" placeholder="<%= M.locPlaceCountry %>"/>
+						</div>
+						<div class="field" id="categorySelectContainer" style="display: none">							
+							<select name="category">
+								<option>&mdash; <%= M.locSelectCategory %> &mdash;</option>
+							</select>
+						</div>
+					</fieldset>
+				</form>
+				<ul class="boxButtons buttons btnMediumButtons">       
+					<li class="item">
+						<button class="btnButton" onclick="placeSubmit();"><%= M.locSubmit %></button>        
+					</li>       
+				</ul>
+			]]></script>
+    <script id="photo_preview" type="text/html"><![CDATA[
+			<div style="display:none" class="se-text-center se-normal-bottom-margin">				
+					<img id="photoPreview" class="se-avatar-border se-box-shadow se-btn-corner-all" style="max-height: 160px">			
+			</div>
+			]]></script>
+    <script id="home_screen_item" type="text/html"><![CDATA[<div class="se-home-screen-item" style="width: <%= item.size.boxSize.width%>px; height: <%= item.size.boxSize.height%>px;">
+				<% if (item.btnImage) { %>				
+					<img class="se-home-screen-img btn-normal" data-src="<%= imageUrl(item.btnImage)%>" style="line-height: <%= item.size.boxSize.height%>px; width: <%= item.size.imgSize.width%>px; height: <%= item.size.imgSize.height%>px;  top: <%= item.origin.y%>px; left: <%= item.origin.x%>px;"></img>
+					<% if (item.btnImagePressed) { %>
+						<img class="se-home-screen-img btn-pressed" data-src="<%= imageUrl(item.btnImagePressed)%>" style="line-height: <%= item.size.boxSize.height%>px; width: <%= item.size.imgSize.width%>px; height: <%= item.size.imgSize.height%>px; top: <%= item.origin.y%>px; left: <%= item.origin.x%>px;"></img>
+					<% } else { %>
+						<img class="se-home-screen-img btn-pressed default-img" data-src="<%= imageUrl(item.btnImage)%>" style="line-height: <%= item.size.boxSize.height%>px; width: <%= item.size.imgSize.width%>px; height: <%= item.size.imgSize.height%>px;  top: <%= item.origin.y%>px; left: <%= item.origin.x%>px;"></img>
+					<% } %>			
+				<% } %>
+			</div>]]></script>
+    <script id="generic_screen" type="text/html"><![CDATA[
+			<div id="generic_content">
+			</div>
+			]]></script>
+    <script id="test" type="text/html"><![CDATA[
+			<ul id="buttons" class="boxButtons buttons btnSmallButtons">
+			</ul>
+			]]></script>
+    <script id="tab_stript_component" type="text/html"><![CDATA[
+			<div>
+			<div class="se-tabstrip-holder">
+			<div class="se-tabstrip">			
+				<div class="se-tabstrip-rail se-content-panel">				
+				</div>			
+			</div>
+			</div>
+		
+			<div class="se-tabstrip-content">
+
+			</div>
+			</div>
+			]]></script>
+    <script id="tabs_component" type="text/html"><![CDATA[
+			<div class="boxTabs">
+				<ul class="tabLinks">				
+				</ul>				
+			<div>
+			]]></script>
+    <script id="article_image" type="text/html"><![CDATA[
+			<div class="se-crop se-avatar-border se-box-shadow se-btn-corner-all img-loading" style="width: <%=width%>; height: <%=height%>; max-width: 100%;">
+				<img src="<%=imageSrc%>" class="se-cropable" onload="cropImage(event);seImageLoaded(event)" onerror="seImageLoadError(event)"></img>
+			</div>
+			]]></script>
+    <script id="load_message_item" type="text/html"><![CDATA[
+			<div>
+				<div id="newsFeedLoadMessage" class="se-text" style=""><%= M.locNewsLoadErrorMessage%></div>
+			</div>
+			]]></script>
+    <script id="gallery_item" type="text/html"><![CDATA[		
+		
+			<% if (feedItem.imageUrl) { %>
+				<li class="se-gallery-img se-crop img-loading se-column" style="width: <%=feedItem.width%>px; height: <%=feedItem.height%>px;">
+					<img class="se-cropable" style="display:none;" onload="cropImage(event);seImageLoaded(event)" onerror="seImageLoadError(event)" data-src="<%= feedItem.imageUrl%>"></img>
+			<% } else { %>
+				<li class="se-gallery-img se-crop img-loading-failed se-column" style="width: <%=feedItem.width%>px; height: <%=feedItem.height%>px;">
+				<div class="se-cropable se-img img-loading-failed"></div>
+			<% } %>					
+		</li>
+			]]></script>
+    <script id="gallery_detail" type="text/html"><![CDATA[
+			<div style="margin:0;">				
+				<div id="gallery-list" class="se-gallery" style="background-color: black;">					
+					<div class="se-screen-holder img-loading se-crop">
+						<div class="se-loading-indicator" styling="z-index: 0;">
+						</div>
+						
+						<img id="image" style="max-width:100%" class="se-no-highlight se-cropable" style="z-index: 10; display:none;" onload="centerImage(event);seImageLoaded(event)" onerror="seImageLoadError(event)" src=""></img>						
+						<div class="se-header">
+							<div class="se-separator">
+								<div id="description" class="se-btn-text se-single-line">&nbsp;</div>							
+							</div>
+							<div id="count" class="se-single-line se-btn-text">&nbsp;</div>
+						</div>
+										
+					<ul class="se-grid se-three-column-grid" style="width: 100%; position: absolute; bottom: 0px;">
+						<li id="previous" class="se-column">
+							<div class="se-column-inner se-gallery-btn">
+								<div class="se-icon se-previous-icon" style="margin: 0 auto 0 auto;"></div>								
+							</div>
+						</li>
+						<li id="details" class="se-column">
+
+						</li>
+						<li id="next" class="se-column">
+							<div class="se-column-inner se-gallery-btn">
+								<div class="se-icon se-next-icon" style="margin: 0 auto 0 auto;"></div>
+							</div>
+						</li>
+					</ul>
+					</div>
+				</div>
+			</div>
+			]]></script>
+    <script id="gallery_page" type="text/html"><![CDATA[
+			<div>				
+				<ul id="gallery-list" class="se-list se-gallery-list" style="width: 100%; position: relative;">
+
+				</ul>
+			</div>
+			]]></script>
+    <script id="button_item" type="text/html"><![CDATA[
+		<div> 
+			<span class="se-btn se-normal-left-right-margin se-btn-corner-all se-drop-shadow">
+				<span class="se-btn-inner se-btn-corner-all">					
+					<span class="se-btn-text">
+						<% if (data.icon) { %>
+							<span class="se-icon" style="background-image: url(<%= data.icon%>)"></span>
+						<% } %>
+						<span id="title">
+							<%= data.title || "&nbsp;" %>
+						</span>
+					</span>
+				</span>
+			</span>
+		</div>
+			]]></script>
+    <script id="coupon_button_item" type="text/html"><![CDATA[
+		<div>		
+			<div class="se-normal-left-right-margin">
+				<div id="coupon-loading" style="text-align: center; display: none;">		
+					<span class="se-spinner-small-icon-dark" style="display: inline-block;"></span>
+				</div> 
+				<div id="coupon-label-panel" class="se-label-panel se-btn-corner-all" style="display:none">
+					<div class="se-title se-single-line">Title</div>
+					<div class="se-subtitle se-single-line">
+						<span><%= M.locTimeToRedeem %>:&nbsp;</span><span id="date"></span>					
+					</div>
+					<div class="se-swipe-to-redeem se-subtitle se-single-line">
+						<span>&gt;&gt;&gt;&gt;&nbsp;<%= M.locSwipeAtCounter %>&nbsp;&gt;&gt;&gt;&gt;</span>
+					</div>
+				</div>			
+				<div id="coupon-buy-button" class="se-btn se-btn-corner-all se-drop-shadow" style="display: none;">
+					<span class="se-btn-inner se-btn-corner-all">
+						<span class="se-btn-text"><%= data.title || "&nbsp;" %></span>
+					</span>
+				</div>
+				<div id="coupon-share-button" class="se-btn se-btn-corner-all se-drop-shadow" style="display: none;">
+					<span class="se-btn-inner se-btn-corner-all">
+						<span class="se-btn-text"><%= data.title || "&nbsp;" %></span>
+					</span>
+				</div>
+			</div>
+			<div id="barcode-panel" style="display: none;">
+				<div id="coupon-barcode"></div>
+				<div id="coupon-deal-redeemed" class="se-icon se-icon-deal-redeemed"></div>
+			</div>			
+		</div>		
+			]]></script>
+    <script id="list_component" type="text/html"><![CDATA[
+			<div>				
+				<div class="se-search-li se-li" style="display:none">
+					<form id="search-form">
+					<div class="li-inner">
+						<div class="se-search-input-holder">
+																	
+							<input class="se-search-input" type="text" value="" placeholder="Search" />
+							<input type="submit" style="display: none" />
+								
+						</div>
+						<div class="se-icon se-search-icon"></div> 
+					</div>	
+					</form>				
+				</div>
+				<div style="clear: both"></div>
+				<div><ul id="newsFeed" class="se-list feedPosts"></ul></div>				
+				<div id="newsFeedLoadMessage" class="se-text" style="display: none;"></div>
+				<div style="clear:both;">				
+				
+				
+				<div id="loading-indicator" class="se-li se-loading-li" style="display: none;">		
+					<div class="se-li-inner">					
+						<div class="se-loading-box">		
+							<span class="se-spinner-small-icon-dark" style="display: inline-block;"></span><span class="se-text"><%= M.locRefreshing %></span>
+						</div>
+					</div>					
+				</div>					
+				 
+				<div id="loadMoreButtonContainer" class="se-big-top-bottom-padding" style="display: none"> 
+					<span id="loadMoreButton" class="se-btn se-big-all-sides-margin se-btn-corner-all se-drop-shadow">
+						<span class="se-btn-inner se-btn-corner-all">
+							<span class="se-btn-text"><%= M.locLoadMoreButtonTitle %></span>
+						</span>
+					</span>
+
+					<li class="item" style="display:none;">
+						<button id="loadMoreButton" class="btnButton"></button>  
+					</li>
+				</div>
+
+			</div>
+			]]></script>
+    <script id="url_feed_item" type="text/html"><![CDATA[
+			<li id="newsFeedItem<%= feedItem.id %>" class="item clearfix" onclick="<%= feedItem.url %>">
+				<% if (feedItem.icon_url) { %>
+					<span class="crop">
+						<img src="<%= getImageUrl(feedItem.icon_url) %>"
+							onload="newsImageLoaded(event)" onerror="newsImageLoadError(event)" />
+					</span>
+				<% } %>
+
+				<h3><%= feedItem.name %></h3>
+				<div class="content">
+					<% if (feedItem.content !== feedItem.name) { %>
+						<%= feedItem.content %>
+					<% } %>
+				</div>
+								
+			</li>
+			]]></script>
+    <script id="video_feed_item" type="text/html"><![CDATA[
+		<li class="se-li se-video-li">
+			<div class="se-li-inner">
+				<div class="se-title"><%= feedItem.title %></div>		
+				
+				<div class="se-video-img-holder se-normal-top-bottom-margin">
+					<% if (feedItem.imageUrl) { %>
+						<img class="se-img img-loading" onload="cropImage(event)" onerror="seImageLoadError(event)" src="<%= feedItem.imageUrl%>"></img>
+					<% } else { %>
+						<div class="se-img img-loading-failed"></div>
+					<% } %>
+					<span class= "se-video-img-overlay se-video-overlay-icon"></span>
+				</div>
+		
+		
+				<div class="se-info-bar-grid se-clear">
+					<span class="se-column se-first-column">
+						<span class="se-info-inner">	
+							<span class="se-icon se-icon-left se-video-icon"></span>
+							<span class="se-info-text"><%= feedItem.itemTime %>&nbsp;</span>
+						</span>
+					</span>
+				
+					<span class="se-column"> 
+						<span class="se-info-inner">
+							<span class="se-icon se-icon-left se-author-icon"></span>
+							<span class="se-info-text"><%= feedItem.author %>&nbsp;</span>
+						</span> 
+					</span>
+					
+					<span class="se-column se-last-column"> 
+						<span class="se-info-inner">
+							<span class="se-icon se-icon-left se-shouts-icon"></span>
+							<span class="se-info-text"><%= feedItem.itemComments ?  feedItem.itemComments : 0%>&nbsp;</span>
+						</span> 
+					</span>
+				</div>
+		
+			</div>
+		</li>
+			]]></script>
+    <script id="info_bar_column" type="text/html"><![CDATA[
+		<span class="se-column">
+			<span class="se-info-inner">	
+				<span class="se-icon"></span>
+				<span class="se-info-text"><%= text%>&nbsp;</span>
+			</span>
+		</span>
+			]]></script>
+    <script id="activity_feed_item" type="text/html"><![CDATA[
+		<li class="se-li se-activity-li">
+			<div class="se-li-inner">
+						
+				
+				<div class="se-video-img-holder img-loading se-crop">
+					<% if (feedItem.image2Url) { %>
+						<img class="se-cropable" onload="cropImage(event);" onerror="seImageLoadError(event)" src="<%= feedItem.image2Url%>" style="display: none"></img>
+
+					<% } else { %>
+						<div class="se-img img-loading-failed"></div>
+					<% } %>
+					<% if (false && feedItem.image2Overlay) { %>
+						<div class="se-video-img-overlay-holder">
+							<span class= "se-video-img-overlay se-video-overlay-icon"></span>
+						</div>	
+					<% } %>
+					<div class="se-title-holder">
+						<span class= "se-video-img-overlay se-video-overlay-icon"></span>
+						<div class="se-title"><%= feedItem.title %></div>
+					</div>
+				</div>
+		
+		
+				<div class="se-three-column-grid se-info-bar-grid se-clear">					
+				</div>
+		
+			</div>
+		</li>
+			]]></script>
+    <script id="people_feed_item" type="text/html"><![CDATA[
+		<li class="se-li se-simple-li se-people-li">
+			<div class="se-li-inner">
+			<% if (feedItem.imageUrl) { %>
+				<%= avatarImg({ cls: 'se-box-shadow se-btn-corner-all se-crop se-avatar-border se-avatar se-avatar-left se-big-right-margin img-loading', imageUrl: feedItem.imageUrl, placeholder: feedItem.imagePlaceholder })%>
+			<% } %>
+				
+				<div class="se-title se-single-line"><%= feedItem.title %></div>
+				<% if (feedItem.points) { %>
+					<div class="se-text se-single-line"><%= feedItem.points %> points</div>
+				<% } %>
+				<% if (feedItem.date) { %>
+					<div class="se-text se-single-line"><%= feedItem.activity %></div>
+					<div class="se-text se-single-line"><%= feedItem.date %></div>
+				<% } %>
+				<div class="se-clear"></div>
+			</div>
+		</li>
+			]]></script>
+    <script id="toast_item" type="text/html"><![CDATA[
+			<div class="se-toast">
+				<div id="message" class="se-toast-inner se-btn-corner-all">					
+				</div>
+			</div>
+		]]></script>
+    <script id="places_feed_item" type="text/html"><![CDATA[
+		<li class="se-li se-places-li">
+			<div class="se-li-inner se-expandible-middle-column-layout"> 				
+
+				<div class="se-middle-column se-has-left-column">
+					<div class="se-column-inner" style="height: 53px;">
+							
+						<div class="se-valign-spacer"></div><div class="se-valign" style="width: 100%;">
+							<div class="se-single-line se-badges-holder"><%= renderPlaceItemBadges(feedItem.badges)%></div>				
+							<div class="se-title se-single-line"><%= feedItem.title %></div>
+							<div class="se-text se-single-line"><%= feedItem.subtitle %></div>
+							<div class="se-info-bar-grid se-clear" style="margin-left: -5px;"></div>
+						</div>					
+					</div>
+				</div>
+				<div class="se-left-column"> 
+					<div class="se-box-shadow se-btn-corner-all se-crop se-avatar-border se-avatar se-avatar-left se-big-right-margin img-loading ">				
+					<% if (feedItem.imageUrl) { %>
+						<img class="se-cropable" onload="cropImage(event);seImageLoaded(event)" onerror="seImageLoadError(event)" src="<%= imageUrl(feedItem.imageUrl)%>"></img>
+					<% } else { %>
+						<div class="img-loading-failed se-avatar" ></div>
+					<% } %>
+					</div>
+				</div>
+				&nbsp;
+				<div style="clear:both;"></div>
+			</div>
+		</li>
+			]]></script>
+    <script id="gallery_disclosure_item_image" type="text/html"><![CDATA[
+			<div class="se-image img-loading se-crop se-image-holder">
+				<img class="se-cropable" style="display:none" onload="cropImageFit(event);seImageLoaded(event);" onerror="seImageLoadError(event)" src="<%= item.src%>"></img>
+			</div>
+		]]></script>
+    <script id="gallery_disclosure_item" type="text/html"><![CDATA[
+		<div class="se-li se-gallery-disclosure-li se-normal-left-right-margin se-btn-corner-all">
+			<div class="se-li-inner se-expandible-middle-column-layout">
+				<div class="se-middle-column">
+					<div class="se-column-inner gallery-content" id="images-holder">						
+					</div>					
+				</div>
+				<div class="se-right-column">
+					<div class="se-column-inner">
+						<div id="right-icon" class="se-icon se-disclosure-icon-dark"></div>
+					</div>
+				</div>
+				<div style="clear:both;"></div>
+			</div>
+		</div>
+		]]></script>
+    <script id="events_feed_item" type="text/html"><![CDATA[
+		<li class="se-li se-events-li">
+			<div class="se-li-inner se-expandible-middle-column-layout"> 				
+
+				<div class="se-middle-column se-has-left-column">
+					<div class="se-column-inner" style="height: 53px;">
+							
+						<div class="se-valign-spacer"></div><div class="se-valign" style="width: 100%;">				
+							<div class="se-title se-single-line"><%= feedItem.title %></div>		
+							<div class="se-text se-single-line"><%= feedItem.summary %></div>
+							<div class="se-info-bar-grid se-clear" style="margin-left: -5px;"></div>
+						</div>					
+					</div>
+				</div>
+				<div class="se-left-column"> 
+					<div class="se-calendar-icon se-avatar se-avatar-border se-box-shadow se-big-right-margin">
+						<div class="se-month se-single-line"><%=getMonth(feedItem.date, feedItem.useDeviceTimeZone)%></div>
+						<div class="se-day se-single-line"><div class="se-day-text"><%=getDay(feedItem.date, feedItem.useDeviceTimeZone)%></div></div>
+					</div>
+				</div>
+				&nbsp;
+				<div style="clear:both;"></div>
+			</div>
+		</li>
+			]]></script>
+    <script id="link-attachment" type="text/html"><![CDATA[
+			<div class="se-text se-single-line se-attachment">
+				<span class="se-icon se-link-icon"></span> 
+				<%= item.url%>
+			</div>
+			]]></script>
+    <script id="checkin-attachment" type="text/html"><![CDATA[
+			<div class="se-text se-single-line se-attachment">
+				<span class="se-icon se-checkin-icon" style="<%= bckCss({ url: item.placeIcon })%>"></span> 
+				<%= item.placeName%>
+			</div>
+			]]></script>
+    <script id="img-attachment" type="text/html"><![CDATA[
+			<div class="se-attachment se-img-attachment">
+				<span class="se-icon <%= icon%>"></span> 
+				<div class="se-image-holder">
+					<div class="se-image">
+					<div class="se-image img-loading se-crop">
+						<img class="se-cropable" style="display:none" onload="cropImageFit(event);seImageLoaded(event);" onerror="seImageLoadError(event)" src="<%= item.url_thumbnail%>"></img>
+					</div>
+					</div>
+				</div>
+			</div>
+			]]></script>
+    <script id="shouts_feed_item" type="text/html"><![CDATA[
+		<li class="se-li se-shouts-li">
+			<div class="se-li-inner se-expandible-middle-column-layout">
+				<div class="se-middle-column se-has-left-column">
+					<div class="se-column-inner">							
+						<div class="se-valign-spacer"></div><div class="se-valign" style="width: 100%;">											
+							<div class="se-text"><span class="se-title"><%= feedItem.title %></span>&nbsp;<%= shortenText(feedItem.summary) %></div>
+							<div class="se-attachments">								
+								<%= renderShoutAttachments(feedItem.attachments, { placeName: feedItem.subtitle, placeIcon: feedItem.image3Url })%>
+							</div>
+							<div class="se-info-bar-grid se-clear se-short" style="margin-left: -5px;"></div>
+						</div>
+					</div>
+				</div>
+				<div class="se-left-column">
+					<%= avatarImg({ cls: 'se-box-shadow se-btn-corner-all img-loading se-crop se-avatar se-normal-bottom-margin', imageUrl: feedItem.image1Url, placeholder: feedItem.image1Placeholder })%> 					
+				</div>				
+				<div style="clear:both;"></div>
+				<div>&nbsp;</div>
+			</div>
+		</li>
+			]]></script>
+    <script id="podcasts_feed_item" type="text/html"><![CDATA[
+		<li class="se-li se-podcasts-li">
+			<div class="se-li-inner se-expandible-middle-column-layout">
+				<%feedItem.buttonTitle = false;%> 
+				<% if (feedItem.buttonTitle) { %>
+					<div class="se-middle-column se-has-left-column se-has-right-column">
+				<% } else { %>
+					<div class="se-middle-column se-has-left-column">
+				<% } %>
+					<div class="se-column-inner" style="height: 53px;">
+							
+						<div class="se-valign-spacer"></div><div class="se-valign" style="width: 100%;">				
+							<div class="se-title"><%= feedItem.title %></div>					
+							<div class="se-info-bar-grid se-clear se-short" style="margin-left: -5px;"></div>
+						</div>					
+					</div>
+				</div>
+				<div class="se-left-column"> 
+					<div class="se-oval-icon se-float-left se-box-shadow se-normal-right-margin" style="margin: 15px 0 15px 0;">
+						<div class="se-icon se-disclosure-icon"></div>
+					</div>
+				</div>
+				<% if (feedItem.buttonTitle) { %>
+					<div class="se-right-column">
+					<span class="se-btn se-normal-left-margin se-normal-top-bottom-margin se-btn-corner-all se-drop-shadow">
+						<span class="se-btn-inner se-btn-corner-all">
+							<span class="se-btn-text"><%=feedItem.buttonTitle%></span>
+						</span>
+					</span>
+					</div>
+				<% } %>
+				<div style="clear:both;"></div>
+			</div>
+		</li>
+			]]></script>
+    <script id="comment_item" type="text/html"><![CDATA[
+			<li class="se-li se-comment-li">			
+			<div class="se-li-inner se-expandible-middle-column-layout">
+				<div class="se-middle-column se-has-left-column">
+					<div class="se-column-inner">
+						<div class="se-title se-float-left"><%=feedItem.author%></div>
+						<div class="se-text">&nbsp;<%=feedItem.message%></div>
+						<% if (feedItem.deletable && feedItem.deletable != "no") { %>
+							<div class="se-info-text" style="float: right;">X <%=M.locConfirmDelete%></div>
+						<% } %>
+						<div class="se-info-text"><%=renderTime(feedItem.publishedDate)%></div>					
+						
+					</div>
+				</div>
+				<div class="se-left-column"> 
+					<%= avatarImg({ cls: 'img-loading se-crop se-btn-corner-all se-avatar se-normal-right-margin se-normal-bottom-margin', imageUrl: feedItem.authorImageUrl, placeholder: feedItem.authorImagePlaceholder })%>					
+				</div>
+				<div style="clear:both;"></div>
+			</div>
+			<div class="se-line"></div>
+		</li>
+			]]></script>
+    <script id="map_control_button" type="text/html"><![CDATA[
+			<div class="se-map-control-btn se-btn-corner-all se-locate">				
+			</div>
+			]]></script>
+    <script id="small_disclosure_item" type="text/html"><![CDATA[
+		<li class="se-li se-small-disclosure-li se-normal-all-sides-margin se-btn-corner-all">
+			<div class="se-li-inner se-expandible-middle-column-layout">
+				<div class="se-middle-column se-has-left-column se-has-right-column">
+					<div class="se-column-inner" style="height: 40px;">
+						<div class="se-valign-spacer"></div><div class="se-valign" style="width: 100%;">				
+							<div class="se-title se-single-line"><%= feedItem.title %></div>							
+						</div>					
+					</div>
+				</div>
+				<div class="se-left-column"> 
+					<div class="se-column-inner">
+						<div class="se-icon se-pin-icon"></div>
+					</div>
+				</div>
+				
+				<div class="se-right-column">
+					<div class="se-column-inner">
+						<div class="se-icon se-disclosure-icon-dark"></div>
+					</div>
+				</div>				
+				<div style="clear:both;"></div>
+			</div>
+		</li>
+			]]></script>
+    <script id="disclosure_item" type="text/html"><![CDATA[
+		<div class="se-li se-small-disclosure-li se-normal-left-right-margin se-btn-corner-all">
+			<div class="se-li-inner se-expandible-middle-column-layout">				
+				<div class="se-middle-column <%= (imageUrl(data.iconName)) ? "se-has-left-column" : ""%>">
+					<div class="se-column-inner" style="height: 40px;">
+						<div class="se-valign-spacer"></div><div class="se-valign" style="width: 100%;">				
+							<div id="title" class="se-title se-single-line"><%= data.title %></div>							
+						</div>					
+					</div>
+				</div>
+				<div class="se-left-column"> 
+					<div class="se-column-inner">
+						<div class="se-icon se-medium-icon" style="background-image: url(<%= imageUrl(data.iconName)%>)"></div>
+					</div>
+				</div>
+				
+				<div class="se-right-column">
+					<div class="se-column-inner">
+						<div id="right-icon" class="se-icon se-disclosure-icon-dark"></div>
+					</div>
+				</div>				
+				<div style="clear:both;"></div>
+			</div>
+		</div>
+			]]></script>
+    <script id="categories_feed_item" type="text/html"><![CDATA[
+		<li class="se-li se-categories-li se-show-separator">
+			<div class="se-li-inner se-expandible-middle-column-layout">				
+				<div class="se-middle-column <%= feedItem.showIcon ? "se-has-left-column" : ""%>">
+					<div class="se-column-inner" style="height: 40px;">
+						<div class="se-valign-spacer"></div><div class="se-valign" style="width: 100%;">				
+							<div id="title" class="se-title se-single-line"><%= feedItem.title %></div>							
+						</div>					
+					</div>
+				</div>
+				<% if (feedItem.showIcon) { %>
+					<div class="se-left-column"> 
+						<div class="se-column-inner">
+							<div class="se-box-shadow se-btn-corner-all se-crop se-avatar-border se-avatar se-avatar-left se-big-right-margin img-loading ">				
+								<% if (feedItem.icon) { %>
+									<img class="se-cropable" onload="cropImage(event);seImageLoaded(event)" onerror="seImageLoadError(event)" src="<%= imageUrl(feedItem.icon)%>"></img>
+								<% } else { %>
+									<div class="img-loading-failed se-avatar" ></div>
+								<% } %>
+							</div>							
+						</div>
+					</div>
+				<% } %>
+				
+				<div class="se-right-column">
+					<div class="se-column-inner">
+						<% if (feedItem.showDisclosure) { %>
+							<div id="right-icon" class="se-icon se-disclosure-icon-dark"></div>
+						<% } %>
+					</div>
+				</div>				
+				<div style="clear:both;"></div>
+			</div>
+		</li>
+			]]></script>
+    <script id="static_map_item" type="text/html"><![CDATA[
+			<div class="se-static-map-item">
+			<div class="se-crop se-avatar-border se-box-shadow img-loading" style="width: <%=width%>; height: <%=height%>; display: inline-block;max-width: 100%;">				
+				<img class="se-cropable map img-loading"></img>
+			</div>
+			</div>	
+			]]></script>
+    <script id="extended_place_info_item" type="text/html"><![CDATA[
+			<div class="extended-place-info-item">									
+					<div class="se-box-shadow img-loading se-crop se-avatar-left se-btn-corner-all se-avatar">
+						<img style="display:none" onload="newsImageLoaded(event);seImageLoaded(event);" onerror="seImageLoadError(event)" src="<%= model.avatarImageUrl%>"></img>
+					</div>
+					<div class="info-text">	
+						<div class="chief-section">
+							<span class="se-icon chief se-inline-block"></span><span class="label chief-title"><%=M.locChief%> &nbsp;</span><span class="label se-theme-color"><%=model.chief%></span>
+						</div>
+						<div class="checked-in-info-section">
+							<span class="check-in-text"><%=M.locCheckedInTimes%> <em><%=model.checkinCount%></em> <%=M.locTimes%>.</span>
+						</div>
+					</div>
+					<div class="check-in-posted-on se-btn-corner-all se-clear">						
+						
+						<div class="posted-on">
+							<div class="se-icon fs-circle"></div>
+							<div class="se-text-center">
+								<span class="se-icon <%=(model.postedOnFoursquare ? 'yes-post' : 'no-post')%> se-inline-block"></span>
+							</div>
+						</div>
+						<div class="posted-on">
+							<div class="se-icon tw-circle"></div>
+							<div class="se-text-center">
+								<span class="se-icon <%=(model.postedOnTwitter ? 'yes-post' : 'no-post')%> se-inline-block"></span>
+							</div>
+						</div>				
+						<div class="posted-on">
+							<div class="se-icon fb-circle"></div>
+							<div class="se-text-center">
+								<span class="se-icon <%=(model.postedOnFacebook ? 'yes-post' : 'no-post')%> se-inline-block"></span>
+							</div>
+						</div>	
+						<div class="label">
+							<%=M.locCheckInPostedOn%>
+						</div>							
+					</div>
+				</div>
+			</div>
+			]]></script>
+    <script id="map_item" type="text/html"><![CDATA[
+		<div class="se-li se-map-li se-btn-corner-all">
+			<div class="se-li-inner se-btn-corner-all">
+				<div class="se-content-box">
+				<div class="se-oval-icon se-box-shadow" style="float: right;">
+					<div class="se-icon se-disclosure-icon"></div>
+				</div>
+				<div class="se-text se-single-line" style="padding: 5px;"><%=feedItem.label%>&nbsp;</div>					
+			</div>				  
+		</div>
+			]]></script>
+    <script id="news_feed_item" type="text/html"><![CDATA[
+		<li class="se-li se-news-li">
+			<div class="se-li-inner">
+				
+				<% if (feedItem.imageUrl) { %>
+					<div class="se-box-shadow img-loading se-avatar-border se-crop se-btn-corner-all se-avatar se-avatar-left se-normal-right-margin se-normal-bottom-margin">
+						<img class="se-cropable" style="display:none" onload="cropImage(event);seImageLoaded(event);" onerror="seImageLoadError(event)" src="<%= feedItem.imageUrl%>"></img>
+					</div>
+				<% } %>
+				
+				<% if (feedItem.rightTitle) { %>
+					<div class="se-title se-right se-single-line"><%=feedItem.rightTitle%></div>
+				<% } %>
+				
+				<div class="se-title"><%= feedItem.title %></div>		
+				<div class="se-text"><%= shortenText(feedItem.summary)%></div>
+				
+				<div class="se-info-bar-grid se-clear se-normal-top-margin">					
+				</div>
+		
+			</div>
+		</li>
+			]]></script>
+    <script id="deal_info_panel" type="text/html"><![CDATA[
+			<div class="se-deal-info-panel">
+				<div class="se-shadow"></div>
+				<div class="se-column se-first-column">
+						<div class="se-column-inner">
+									<div class="se-title">Expires</div>
+									<div class="se-sales-price se-single-line"><%= data.expires %></div>
+						</div>
+			        </div>
+				<div class="se-column">
+						<div class="se-column-inner">
+									<div class="se-title"><%= M.locDiscount %></div>
+									<div class="se-discount-percentage se-single-line"><%= data.discount %></div>
+									
+						</div>
+			        </div>
+				<div class="se-column se-last-column">
+						<div class="se-column-inner">
+									<div class="se-title">&nbsp;</div>
+									<div class="se-sales-price se-single-line">&nbsp;</div>	
+						</div>
+			        </div>
+			</div>
+			]]></script>
+    <script id="deals_feed_item" type="text/html"><![CDATA[
+		<li class="se-li se-deals-li">
+			<div class="se-li-inner">
+				
+				<% if (feedItem.imageUrl) { %>
+					<div class="se-box-shadow img-loading se-crop se-avatar se-avatar-left se-normal-right-margin se-normal-bottom-margin">
+						<img style="display:none" onload="newsImageLoaded(event);seImageLoaded(event);" onerror="seImageLoadError(event)" src="<%= feedItem.imageUrl%>"></img>
+					</div>
+				<% } else { %>
+					<div class="se-box-shadow img-loading-failed se-crop se-avatar se-avatar-left se-normal-right-margin se-normal-bottom-margin"></div>
+				<% } %>
+				<div class="se-top-right-text"><%= feedItem.topRightText %></div>
+				<div class="se-title"><%= feedItem.title %></div>
+				<div class="se-left-text se-sales-price se-single-line"><%= feedItem.leftText %></div>
+				<div class="se-right-text se-single-line"><%= feedItem.rightText %></div>				
+				<div class="se-info-bar-grid se-clear se-normal-top-margin">					
+				</div>
+		
+			</div>
+		</li>
+			]]></script>
+    <script id="normal_feed_item" type="text/html"><![CDATA[
+			<li class="item clearfix">
+				<% if (feedItem.imageUrl) { %>
+					<span class="crop">
+						<img src="<%= feedItem.imageUrl %>"
+							onload="newsImageLoaded(event)" onerror="newsImageLoadError(event)" />
+					</span>
+				<% } %>
+
+				<h3><%= feedItem.title %></h3>
+				<div class="content">
+					<% if (feedItem.summary !== feedItem.title) { %>
+						<%= feedItem.summary %>
+					<% } %>
+				</div>
+				
+				<% if (feedItem.infoFirstSegment || feedItem.author || feedItem.itemComments) { %>
+					<ul class="txtInfo">
+						<% if (feedItem.infoFirstSegment) { %>
+    						<li class="time_distance"><%= feedItem.infoFirstSegment %></li>
+						<% } %>
+						<% if (feedItem.author) { %>
+    						<li class="author" style="max-width:<%= ($(window).width() - 250)%>px"><%= feedItem.author %></li>
+						<% } %>
+						<% if (feedItem.itemComments) { %>
+    						<li class="comments"><%= feedItem.itemComments ?  feedItem.itemComments : 0%></li>
+						<% } %>
+					</ul>
+				<% } %>
+			</li>
+			]]></script>
+    <script id="detailed_title_item" type="text/html"><![CDATA[
+		<div class="article-header">
+			<div class="se-expandible-middle-column-layout">
+				<% if (data.iconUrl || data.date) { %>
+				<div class="se-middle-column se-has-left-column">
+				<% } else { %>
+				<div class="se-middle-column">
+				<% } %>	
+					<div class="se-column-inner">
+						<div class="se-valign-spacer"></div><div class="se-valign">				
+							<div class="se-title"><%= data.title%></div>
+							<% if (data.subtitle) { %>
+								<div class="se-text" onClick="return false;"><%= data.subtitle%> points</div>
+							<% } %>			
+						</div>
+					</div>
+				</div>						
+				<% if (data.iconUrl || data.date) { %>
+					<div class="se-left-column">
+						<% if (data.date) { %>
+							<div class="se-calendar-icon se-avatar se-avatar-border se-box-shadow se-big-right-margin">
+								<div class="se-month se-single-line"><%=getMonth(data.date, data.useDeviceTimeZone)%></div>
+								<div class="se-day se-single-line"><div class="se-day-text"><%=getDay(data.date, data.useDeviceTimeZone)%></div></div>
+							</div>
+						<% } else { %>
+							<div class="se-column-inner">									
+								<img src="<%=imageUrl(data.iconUrl)%>"></img>
+							</div>
+						<% } %>
+					</div>
+				<% } %>						
+			</div>
+			<div style="clear:both;"></div>
+			<div class="se-info-bar-grid se-clear se-wide se-normal-top-margin"></div>
+		</div>		
+			]]></script>
+    <script id="comments_list_component" type="text/html"><![CDATA[
+			<div class="se-comments-list">
+			<div id="loading-indicator" class="se-li se-loading-li" style="display: none;">		
+				<div class="se-li-inner">					
+					<div class="se-loading-box">		
+						<span class="se-spinner-small-icon-dark" style="display: inline-block;"></span><span class="se-text"><%= M.locRefreshing %></span>
+					</div>
+				</div>					
+			</div>
+			<ul id="loadMoreContainer" style="display:none;">
+				<li class="se-li se-load-more" id="loadMoreCommentsButton">
+					<div class="se-li-inner">					
+					<div class="se-icon se-shouts-icon-dark se-float-left"></div><div class="se-text se-single-line"><%=M.locShowAllComments%></div>
+					</div>
+					<div class="se-line"></div>	
+				</li>
+				
+			</ul>					
+			<ul id="newsComments" style="display: none;"></ul>
+			</div>	
+			]]></script>
+    <script id="audio_preview" type="text/html"><![CDATA[
+			<div id="newsAudioContainer">
+				<% if (is_embedded) { %>
+					<audio src="<%= audio_url %>" controls autoplay="autoplay"></audio>
+				<% } else { %>
+					<a href="<%= audio_url %>" target="_blank" onclick="openInAudioPlayer(event)">
+						<img src="<%= window.imageUrl(I.audioPlayIcon)%>" alt="" style="width: 100%" />
+					</a>
+            	<% } %>
+			</div>
+			]]></script>
+    <script id="video_preview" type="text/html"><![CDATA[
+			
+			<a href="<%= videoUrl %>" class="videoImageContainer" target="_blank" onclick="openInVideoPlayer(event)">
+				<% if (imageUrl) { %>
+					<div style="width: <%=width%>px; height: <%=height%>px; max-width: 100%; margin: 0 auto 0 auto;" class="se-crop se-btn-corner-all se-box-shadow se-avatar-border se-btn-corner-all">
+					<img style="width: 100%" src="<%= imageUrl %>" alt="<%= M.locWatchVideo %>" class="media-img" />
+					<img src="<%= window.imageUrl(I.videoPlayIcon)%>" class="playIcon" alt="" />
+					</div>
+
+				<% } else { %>
+					<%= M.locWatchVideo %>
+				<% } %>
+			</a>	
+			]]></script>
+    <script id="audio_player_item" type="text/html"><![CDATA[			
+			<div class="se-player" style="margin: 10px;">
+			<audio src="<%= feedItem.audio_url %>">Audio tag is not supported!</audio>
+			<div class="se-expandible-middle-column-layout se-drop-shadow se-btn-corner-all">
+					<div class="se-middle-column se-has-left-column se-has-right-column">
+					<div class="se-column-inner">
+						<div id="slider-control" style="width: 100%; height: 200%; position: relative; top:-50%;">
+						<div class="se-rail">
+							<div id="slider-trail" class="se-trail"></div>
+							<div id="slider-thumb" class="se-thumb" style="display: none;"></div>
+						</div>				
+						</div>	
+					</div>
+				</div>
+				<div class="se-left-column se-btn-corner-left">
+					<div id="play-pause-btn" class="se-column-inner se-btn-corner-left not-loaded">
+						<div class="se-player-icon"></div>
+					</div> 
+					
+				</div>
+				
+				<div class="se-right-column se-btn-corner-right">
+					<div class="se-column-inner se-btn-corner-right se-single-line">
+							
+						<div id="time" class="se-text">00:00:00</div>						
+					</div>
+					
+				</div>				
+				<div style="clear:both;"></div>
+			</div>
+			]]></script>
+    <script id="badges_list" type="text/html"><![CDATA[
+			<ul id="badgesList" class="board">
+			</ul>
+			<div id="badgesListLoadMessage" class="boxData feed" style="display: none;"></div>
+			]]></script>
+    <script id="badges_list_item" type="text/html"><![CDATA[
+			<li>
+  				<img src="<%= badge.image_url %>">
+  				<p class="content">
+	      			<strong><%= badge.name %></strong>
+  				</p>
+			</li>
+		]]></script>
+    
+    
+      <script type="text/javascript" id="ServerConfig">serverConfig = { networkId: '1', facebookAppId: 251820904938124, mountPath: 'm3', appDomain: "app", phone: '8554727743', email: 'robot@robotfruit.com', share_title: 'RobotFruit', share_link: 'http://app.rfdove.com', designMode: false, fbConnectPath: 'http://rfdove.com/mobile.php/oauth/facebook.html', robotfruitApi: 'http://app.rfdove.com/mobile.php', configurationApi: 'http://app.rfdove.com/mobile.php/merchant/', twitterConnectPath: 'http://rfdove.com/mobile.php/oauth/twitter.html', userId: '', host: 'rfdove.com', userSession: '', twitterEndpointPath: 'http://rfdoveß.com/mobile.php/oauth/twitter_oauth.html', unitSystem: 'Imperial' };
+    
+    
+    
+    </script>
+
+      <script type="text/javascript" src="js/google.js?v=2"></script>
+      <script type="text/javascript" src="js/iscroll.js?v=2"></script>
+      <script type="text/javascript" src="js/components.js?v=2"></script>
+      <script type="text/javascript" src="js/jquery.js?v=4"></script>
+      <script type="text/javascript" src="js/jquery.form.js?v=4"></script>
+      <script type="text/javascript" src="js/device.js?v=4"></script>
+      <script type="text/javascript" src="js/jquery.ui.widget.js"></script>
+      <script type="text/javascript" src="js/jquery.screen.js"></script>
+      <script type="text/javascript" src="js/jquery.date.js"></script>
+      <script type="text/javascript" src="js/geo.js?v=2"></script>
+      <script type="text/javascript" src="js/action.js?v=2"></script>
+      <script type="text/javascript" src="js/info.js"></script>
+      <script type="text/javascript" src="js/misc.js"></script>
+      <script type="text/javascript" src="js/webapp.js"></script>
+      <script type="text/javascript" src="js/provider.js"></script>
+      <script type="text/javascript" src="js/screen.js?v=2"></script>
+      <script type="text/javascript" src="js/init.js"></script>
+
+
+
+
+<script type="text/javascript">
+SEPageHeaderPanel = ComponentBase.extend({
+    init: function (a) {
+        this._super(a);
+        this.item = a;
+    },
+    load: function (a, d) {
+        var c = $(renderEjs("detailed_title_item", {
+            data: this.item
+        }));
+        var b = c.find(".se-info-bar-grid");
+        if (createInfoBar(b, this.item)) {
+            c.addClass("with-infobar");
+        } else {
+            b.hide();
+        }
+        this.jContent.append(c);
+        this.anchorContent(a);
+	
+	cordova.exec(function(success) {}, function(error) {}, "Title", "change", [this.item.title]);
+    }
+});
+</script>
+
+
+
+</body>
+</html>

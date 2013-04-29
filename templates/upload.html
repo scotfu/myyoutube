@@ -19,11 +19,17 @@ Upload new video
 
 {% block body%}
 
+{% if error %}
+
+<div class="alert alert-error" align="center">   
+  {{ error }}
+</div>
+  {% endif %}
     <h1>Upload new File</h1>
     <form class="form-inline" action="" method=post enctype=multipart/form-data>
 
 <label>Name</label>: <input type=text name='name'>
-<span class="help-block">Example block-level help text here.</span>
+<br/>
 <label>File</label>: <input type=file name=file><br/>
 <button class="btn " type="submit">Upload</button>
     </form>
